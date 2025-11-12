@@ -1,0 +1,359 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+/// A data model for a video item, containing details like title, image, and channel info.
+class VideoItem {
+  final String title;
+  final String imageUrl;
+  final String channelName;
+  final String views;
+  final String uploadTime;
+  final String channelImageUrl; // New field for channel avatar image
+
+  const VideoItem({
+    required this.title,
+    required this.imageUrl,
+    required this.channelName,
+    required this.views,
+    required this.uploadTime,
+    required this.channelImageUrl, // Must be initialized
+  });
+}
+
+/// A widget that displays a single video item, including its thumbnail and details.
+class VideoCard extends StatelessWidget {
+  final VideoItem video;
+
+  const VideoCard({
+    required this.video,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          // Video Thumbnail
+          Image.network(
+            video.imageUrl,
+            fit: BoxFit.cover,
+            height: 400, // Increased height for consistent video thumbnail size
+            width: double.infinity, // Take full width
+            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+              return Container(
+                height: 280, // Updated height to match the image height
+                color: Colors.grey[300],
+                child: const Center(
+                  child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                ),
+              );
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                // Channel Avatar (now uses the dynamic channelImageUrl)
+                CircleAvatar(
+                  backgroundImage: NetworkImage(
+                    video.channelImageUrl,
+                  ),
+                  radius: 20,
+                ),
+                const SizedBox(width: 8.0),
+                // Video Details (Title, Channel Name, Views, Upload Time)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        video.title,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        '${video.channelName} • ${video.views} • ${video.uploadTime}',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 14,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                // More options icon for the video
+                IconButton(
+                  icon: const Icon(Icons.more_vert, color: Colors.black),
+                  onPressed: () {
+                    // Handle more options for the video
+                  },
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  int _selectedIndex = 0;
+  bool _isSearching = false; // State variable to control search field visibility
+
+  // Data model for category button names
+  static const List<String> _buttonNames = <String>[
+    'All',
+    'Music',
+    'Gaming',
+    'News',
+    'Live',
+    'Sports',
+    'Podcasts',
+    'Comedy',
+    'Science',
+    'Technology',
+  ];
+
+  // Sample data model for video items, now including channelImageUrl
+  static const List<VideoItem> _videoItems = <VideoItem>[
+    VideoItem(
+      title: 'Amazing Flutter UI Tutorial - Build Your Own App!',
+      imageUrl: 'https://s3.ap-south-1.amazonaws.com/stage.radixweb.com/medium_Tutorial_to_learn_flutter_for_beginners_5ed4e05330.jpg',
+      channelName: 'Flutter Devs',
+      views: '1.2M views',
+      uploadTime: '2 days ago',
+      channelImageUrl: 'https://yt3.googleusercontent.com/ytc/AIdro_kBwBfJE8gzf07zmKXuDON9izox-hvpXyWtgJBk3l3ep-8=s900-c-k-c0x00ffffff-no-rj',
+    ),
+    VideoItem(
+      title: 'Exploring the Galaxy: A Journey Through Stars',
+      imageUrl: 'https://i.ytimg.com/vi/aNmYd5ncuFg/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLAXS-A12ahgljkYW1F4D_85M_sh-w',
+      channelName: 'Space Wonders',
+      views: '567K views',
+      uploadTime: '1 week ago',
+      channelImageUrl: 'https://www.shutterstock.com/image-vector/creative-abstract-galaxy-solar-system-260nw-2133263235.jpg',
+    ),
+    VideoItem(
+      title: 'Cooking Masterclass: Italian Pasta Secrets',
+      imageUrl: 'https://i.ytimg.com/vi/5lMiyNUlxAw/maxresdefault.jpg',
+      channelName: 'Chef\'s Table',
+      views: '3.4M views',
+      uploadTime: '3 months ago',
+      channelImageUrl: 'https://i.pinimg.com/474x/7c/d4/3c/7cd43ceaeb005c426d9135e03ad7082c.jpg',
+    ),
+    VideoItem(
+      title: 'Top 10 Gadgets You Must Have in 2024',
+      imageUrl: 'https://i.ytimg.com/vi/X7W9k3TDYTc/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDgGZZtZ3qQ1UQU5d4N46C_84ZQPQ',
+      channelName: 'Tech Reviews',
+      views: '899K views',
+      uploadTime: '1 month ago',
+      channelImageUrl: 'https://cms-assets.tutsplus.com/cdn-cgi/image/width=360/uploads/users/1631/posts/32707/item-list-card/TechLogos04_copy.jpg',
+    ),
+    VideoItem(
+      title: 'Relaxing Nature Sounds for Sleep and Focus',
+      imageUrl: 'https://i.ytimg.com/vi/G8nNGk6LHaM/hqdefault.jpg',
+      channelName: 'Nature Sounds',
+      views: '7.8M views',
+      uploadTime: '6 months ago',
+      channelImageUrl: 'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.white, // Always white AppBar
+          iconTheme: const IconThemeData(color: Colors.black), // Always black icons
+          titleTextStyle: const TextStyle(
+              color: Colors.black,
+              fontSize: 20), // Always black title text
+          leading: _isSearching
+              ? IconButton(
+                  icon: const Icon(Icons.arrow_back,
+                      color: Colors.black), // Explicitly black for visibility
+                  onPressed: () {
+                    setState(() {
+                      _isSearching = false;
+                    });
+                  },
+                )
+              : null,
+          title: _isSearching
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search YouTube',
+                      filled: true,
+                      fillColor: Colors.grey[200], // Text box in grey color
+                      hintStyle: const TextStyle(color: Colors.grey),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 1.0, horizontal: 16.0),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(24.0),
+                        borderSide: BorderSide.none,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.mic, color: Colors.black),
+                        onPressed: () {
+                          // Handle microphone button press
+                        },
+                      ),
+                    ),
+                    keyboardType: TextInputType.text,
+                    autofocus: true,
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                )
+              : Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Image.network(
+                      'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSG8mOoMjnCt8ZkqobhyjbBdQ-wlwbPODwJvA&s',
+                      width: 32.0,
+                      height: 32.0,
+                    ),
+                    const SizedBox(width: 8.0),
+                    const Text('YouTube'),
+                  ],
+                ),
+          actions: <Widget>[
+            if (!_isSearching) ...<Widget>[
+              IconButton(
+                icon: const Icon(Icons.cast, color: Colors.black),
+                onPressed: () {
+                  // Handle cast button press
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.notifications, color: Colors.black),
+                onPressed: () {
+                  // Handle notifications button press
+                },
+              ),
+            ],
+            IconButton(
+              icon: Icon(
+                _isSearching ? Icons.clear : Icons.search,
+                color: Colors.black,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isSearching = !_isSearching;
+                });
+              },
+            ),
+          ],
+        ),
+        body: Column(
+          children: <Widget>[
+            // Horizontal scrollable list of category buttons
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _buttonNames.map<Widget>((String name) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Handle button press for the category: $name
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black, // Text color
+                        backgroundColor: Colors.grey[200], // Button background color
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                        ),
+                        elevation: 0, // No shadow
+                      ),
+                      child: Text(name),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+            const Divider(height: 1, color: Colors.grey), // Separator below category buttons
+
+            // Expanded list of video cards
+            Expanded(
+              child: ListView.builder(
+                itemCount: _videoItems.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return VideoCard(video: _videoItems[index]);
+                },
+              ),
+            ),
+          ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (int index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          destinations: const <NavigationDestination>[
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.explore_outlined),
+              selectedIcon: Icon(Icons.explore),
+              label: 'Explore',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.add_circle_rounded),
+              selectedIcon: Icon(Icons.add_circle_rounded),
+              label: 'Create',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.subscriptions_outlined),
+              selectedIcon: Icon(Icons.subscriptions),
+              label: 'Subscriptions',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.video_library_outlined),
+              selectedIcon: Icon(Icons.video_library),
+              label: 'Library',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
